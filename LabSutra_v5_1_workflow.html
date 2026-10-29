@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LabSutra LIMS v5.1</title>
+<style>
+:root{--navy:#082f49;--blue:#0369a1;--cyan:#0891b2;--bg:#f1f5f9;--text:#0f172a;--muted:#64748b;--border:#dbe4ee}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden,[hidden]{display:none!important}
+#authScreen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#082f49,#075985,#164e63)}.auth-card{width:100%;max-width:480px;background:#fff;padding:30px;border-radius:18px;box-shadow:0 20px 60px #001b2d55}.logo{text-align:center;font-size:38px}.auth-card h1{text-align:center;color:#075985;margin:8px 0}.tagline{text-align:center;color:#0891b2;margin:0 0 24px}.auth-card h2{margin:0 0 8px}label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;background:#fff}button.primary{border:0;background:#0369a1;color:#fff;padding:11px 15px;border-radius:8px;font-weight:700}button.primary:hover{background:#075985}button.secondary{border:1px solid #cbd5e1;background:white;color:#334155;padding:9px 12px;border-radius:8px;font-weight:700}.full{width:100%;margin-top:16px}.error{color:#b91c1c;font-size:13px;min-height:18px}.hint{font-size:12px;color:#64748b;line-height:1.5;background:#f8fafc;padding:12px;border-radius:9px;margin-top:16px}
+header{background:linear-gradient(90deg,#0e7490,#1e3a8a);color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:15px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;color:#cffafe;font-size:13px}.user{text-align:right;font-size:13px;line-height:1.7}.user button{background:#fff;color:#075985;border:0;border-radius:7px;padding:6px 10px;font-weight:700}
+.layout{display:flex;min-height:calc(100vh - 90px)}aside{width:235px;background:#0f172a;padding:14px 10px;flex-shrink:0}.nav{display:block;width:100%;text-align:left;padding:11px;border:0;background:transparent;color:#cbd5e1;border-radius:8px;margin:3px 0}.nav:hover,.nav.active{background:#0e7490;color:white}.navhead{color:#94a3b8;font-size:11px;text-transform:uppercase;padding:8px 10px;letter-spacing:1px}main{flex:1;min-width:0;padding:22px;overflow:auto}.page{display:none}.page.active{display:block}h2{font-size:24px;color:#075985;margin:0 0 18px}h3{font-size:17px;margin:0 0 12px}.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:17px;margin-bottom:16px;box-shadow:0 3px 10px #0f172a08}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric-label{color:#64748b;font-size:13px}.metric-value{font-size:28px;font-weight:bold;color:#075985;margin-top:7px}.muted{color:#64748b;font-size:13px}.notice{padding:12px;border-radius:9px;background:#eff6ff;color:#1e40af;font-size:13px;line-height:1.5;margin-bottom:15px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.span2{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #e2e8f0;vertical-align:top}th{background:#f8fafc;color:#475569}.tablewrap{overflow:auto}.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:bold;background:#e0f2fe;color:#075985}.badge.green{background:#dcfce7;color:#166534}.badge.amber{background:#fef3c7;color:#92400e}.badge.red{background:#fee2e2;color:#991b1b}.footer{text-align:center;color:#64748b;font-size:12px;padding:16px}
+@media(max-width:850px){.layout{display:block}aside{width:100%;display:flex;flex-wrap:wrap}.navhead{width:100%}.nav{width:auto}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:14px}}@media(max-width:560px){header{align-items:flex-start;flex-direction:column}.user{text-align:left}.grid,.formgrid{grid-template-columns:1fr}.span2{grid-column:auto}main{padding:10px}.auth-card{padding:22px}}
+</style></head>
+<body>
+<section id="authScreen"><div class="auth-card">
+<div class="logo">🧪</div><h1>LabSutra</h1><p class="tagline">Precision in Every Result</p>
+<div id="setupPanel" hidden>
+<h2>Initial Administrator Setup</h2><p class="muted">Create the first administrator account. There are no pre-created demo users.</p>
+<form id="setupForm"><label for="setupName">Administrator name</label><input id="setupName" required>
+<label for="setupUser">Administrator User ID</label><input id="setupUser" required autocomplete="username">
+<label for="setupPass">Password (minimum 12 characters)</label><input id="setupPass" type="password" minlength="12" required autocomplete="new-password">
+<label for="setupConfirm">Confirm password</label><input id="setupConfirm" type="password" minlength="12" required autocomplete="new-password">
+<p id="setupError" class="error"></p><button class="primary full" type="submit">Create Administrator</button></form>
+</div>
+<div id="loginPanel" hidden><h2>Sign in</h2><p class="muted">Use the account created by your administrator.</p>
+<form id="loginForm"><label for="loginUser">User ID</label><input id="loginUser" required autocomplete="username">
+<label for="loginPass">Password</label><input id="loginPass" type="password" required autocomplete="current-password">
+<p id="loginError" class="error"></p><button class="primary full" type="submit">Sign in</button></form></div>
+<div class="hint">This browser-only prototype stores accounts and workflow data in this browser. It is not secure enough for real laboratory or regulated data. A production deployment needs a server, database, secure password hashing, access controls, and compliant audit trails.</div>
+</div></section>
+
+<div id="app" hidden>
+<header><div><h1>🧪 LabSutra Enterprise LIMS</h1><p>Precision in Every Result</p></div><div class="user"><div id="userName"></div><div id="userRole"></div><button id="logout">Log out</button></div></header>
+<div class="layout"><aside><div class="navhead">Workspace</div>
+<button class="nav active" data-page="dashboard">📊 Dashboard</button>
+<button class="nav" data-page="usersPage" data-roles="Admin">👥 User Management</button>
+<button class="nav" data-page="userspage" data-roles="Admin">System security and access control</button>
+<button class="nav" data-page="userspage" data-roles="Admin">Database and Backup Management</button>
+<button class="nav" data-page="userspage" data-roles="Admin">Audit Trails</button>
+<button class="nav" data-page="userspage" data-roles="Admin">System Maintenance and troubleshooting</button>
+<button class="nav" data-page="userspage" data-roles="Admin">System security and access control</button>
+<button class="nav" data-page="userspage" data-roles="Admin">Compliance and Documentation</button>
+<button class="nav" data-page="userspage" data-roles="Admin">System security and access control</button>
+<button class="nav" data-page="userspage" data-roles="QC Analyst, QC Reviewer,QA Reviewer">Pending Tasks</button>
+<button class="nav" data-page="userspage" data-roles="QC Analyst, QC Reviewer,QA Reviewer">In-Process tasks</button>
+<button class="nav" data-page="userspage" data-roles="QC Analyst, QC Reviewer,QA Reviewer">Completed tasks</button>
+<button class="nav" data-page="tasksPage" data-roles="QC Reviewer,QC Analyst,QA Reviewer,Admin,QA Approver">📋 Task Queue</button>
+<button class="nav" data-page="samplesPage" data-roles="QC Analyst,QC Reviewer">📦 Sample Registration</button>
+<button class="nav" data-page="testingPage" data-roles="QC Analyst">🧪 Enter Test Data</button>
+<button class="nav" data-page="qaReviewPage" data-roles="QA Reviewer">🔎 QA Review Queue</button>
+<button class="nav" data-page="approvalPage" data-roles="QA Approver">✅ QA Approval Queue</button>
+<button class="nav" data-page="oosPage" data-roles="QC Analyst,QC Reviewer,QA Reviewer">⚠ LIR/OOS / OOT</button>
+<button class="nav" data-page="userspage" data-roles="QC Analyst, QC Reviewer,QA Reviewer"> ReturnedTasks</button>
+<button class="nav" data-page="auditPage" data-roles="Admin,QC Reviewer,QA Reviewer,QA Approver">🔐 Activity Log</button>
+</aside>
+<main>
+<div class="notice">Workflow prototype. Use approved site SOPs for real work. This page does not provide compliant electronic signatures, validated calculations, or an immutable audit trail.</div>
+<section id="dashboard" class="page active"><h2 id="dashTitle">Dashboard</h2><div class="grid" id="metrics"></div><div class="card"><h3>My workflow</h3><p id="dashWorkflow" class="muted"></p></div><div class="card"><h3>My pending tasks</h3><div class="tablewrap"><table><thead><tr><th>Task</th><th>Sample</th><th>Status</th><th>Assigned to</th></tr></thead><tbody id="myTasks"></tbody></table></div></div></section>
+<section id="usersPage" class="page"><h2>User Management</h2><div class="card"><h3>Create user account</h3><form id="createUserForm" class="formgrid">
+<div><label for="newName">Full name *</label><input id="newName" required></div><div><label for="newUser">User ID *</label><input id="newUser" required></div>
+<div><label for="newPass">Temporary password (12+ characters) *</label><input id="newPass" type="password" minlength="12" required></div>
+<div><label for="newRole">Assigned role *</label><select id="newRole" required><option value="">Choose role</option><option>QC Analyst</option><option>QC Reviewer</option><option>QA Reviewer</option><option>QA Approver</option><option>Admin</option></select></div>
+<div class="span2"><button class="primary" type="submit">Create account</button><p id="userMessage" class="muted"></p></div></form></div>
+<div class="card"><h3>Accounts</h3><div class="tablewrap"><table><thead><tr><th>Name</th><th>User ID</th><th>Role</th><th>Status</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></section>
+
+<section id="tasksPage" class="page"><h2>QC Task Queue</h2><div class="card" id="reviewerAssignCard"><h3>Review incoming requests and assign analysts</h3><p class="muted">QC Reviewer can create a task, choose an analyst, and assign it. Analysts then submit results for QC review.</p>
+<form id="taskForm" class="formgrid"><div><label for="taskSample">Sample / analytical reference *</label><input id="taskSample" required></div><div><label for="taskName">Task / test *</label><input id="taskName" required placeholder="e.g. Assay by HPLC"></div><div><label for="taskAnalyst">Assign to QC Analyst *</label><select id="taskAnalyst" required></select></div><div><label for="taskDue">Due date</label><input id="taskDue" type="date"></div><div class="span2"><label for="taskNotes">Instructions / method reference</label><textarea id="taskNotes" rows="2"></textarea></div><div class="span2"><button class="primary" type="submit">Create and assign task</button><p id="taskMessage" class="muted"></p></div></form></div>
+<div class="card"><h3>Tasks</h3><div class="tablewrap"><table><thead><tr><th>Task</th><th>Sample</th><th>Assigned analyst</th><th>Status</th><th>Result / notes</th><th>Action</th></tr></thead><tbody id="tasksTable"></tbody></table></div></div></section>
+
+<section id="samplesPage" class="page"><h2>Sample Registration</h2><div class="card"><form id="sampleForm" class="formgrid"><div><label for="sampleProduct">Product name *</label><input id="sampleProduct" required></div><div><label for="sampleBatch">Batch number *</label><input id="sampleBatch" required></div><div><label for="sampleType">Sample type</label><select id="sampleType"><option>API</option><option>Finished Product</option><option>Raw Material</option><option>Stability Sample</option></select></div><div><label for="sampleAnalysis">Analysis type</label><select id="sampleAnalysis"><option>HPLC</option><option>GC</option><option>Wet Analysis</option><option>Microbiology</option><option>Other</option></select></div><div class="span2"><button class="primary" type="submit">Register sample and request QC review</button><p id="sampleMessage" class="muted"></p></div></form></div><div class="card"><h3>Samples</h3><div class="tablewrap"><table><thead><tr><th>Reference</th><th>Product</th><th>Batch</th><th>Analysis</th><th>Status</th></tr></thead><tbody id="samplesTable"></tbody></table></div></div></section>
+
+<section id="testingPage" class="page"><h2>Enter Test Results</h2><div class="card"><p class="muted">Only tasks assigned to the signed-in analyst can be submitted from this form.</p><form id="resultForm" class="formgrid"><div class="span2"><label for="resultTask">Assigned task *</label><select id="resultTask" required></select></div><div><label for="resultValue">Result / observation *</label><input id="resultValue" required></div><div><label for="resultRaw">Raw data / chromatogram reference *</label><input id="resultRaw" required></div><div class="span2"><label for="resultNotes">Analyst notes</label><textarea id="resultNotes" rows="3"></textarea></div><div class="span2"><button class="primary" type="submit">Submit results for QC review</button><p id="resultMessage" class="muted"></p></div></form></div></section>
+
+<section id="qaReviewPage" class="page"><h2>QA Reviewer Queue</h2><div class="card"><p class="muted">Review QC-reviewed records and forward them to the QA Approver.</p><div class="tablewrap"><table><thead><tr><th>Task</th><th>Sample</th><th>Analyst result</th><th>QC review</th><th>Action</th></tr></thead><tbody id="qaReviewTable"></tbody></table></div></div></section>
+
+<section id="approvalPage" class="page"><h2>QA Approver Queue</h2><div class="card"><p class="muted">Review records forwarded by QA Reviewer. Demo actions are not compliant electronic signatures.</p><div class="tablewrap"><table><thead><tr><th>Task</th><th>Sample</th><th>Result</th><th>Forwarded by</th><th>Action</th></tr></thead><tbody id="approvalTable"></tbody></table></div></div></section>
+
+<section id="oosPage" class="page"><h2>OOS / OOT Notes</h2><div class="card"><p>Use your approved investigation SOP for actual OOS/OOT events. This prototype does not determine root cause.</p><form id="oosForm"><label for="oosRef">Sample / task reference</label><input id="oosRef" required><label for="oosNote">Observation</label><textarea id="oosNote" rows="3" required></textarea><button class="primary" style="margin-top:12px">Save note</button><p id="oosMessage" class="muted"></p></form></div></section>
+
+<section id="auditPage" class="page"><h2>Activity Log</h2><div class="card"><p class="muted">Browser-session log only; not immutable or compliant.</p><div class="tablewrap"><table><thead><tr><th>Time</th><th>User</th><th>Role</th><th>Activity</th></tr></thead><tbody id="auditTable"></tbody></table></div></div></section>
+</main></div><div class="footer">LabSutra LIMS v5.1 · Precision in Every Result · Workflow prototype</div></div>
+
+<script>
+"use strict";
+/* Browser-only prototype. Passwords are not safely stored here; production needs a secure backend. */
+const STORE_KEY = "labsutraPrototype_v51";
+const $ = id => document.getElementById(id);
+let state = {users:[],tasks:[],samples:[],audit:[],nextTask:1,nextSample:1001};
+let currentUser = null;
+
+function loadState(){
+  try { const raw = localStorage.getItem(STORE_KEY); if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.users))state={...state,...parsed};} } catch(e) { console.warn("Could not load local prototype data",e); }
+  updateAuthView();
+}
+function saveState(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){alert("Could not save data in this browser.");}}
+function updateAuthView(){
+  const firstAdminNeeded = state.users.length===0;
+  $("setupPanel").hidden=!firstAdminNeeded;
+  $("loginPanel").hidden=firstAdminNeeded;
+}
+function logActivity(action){
+  if(!currentUser)return;
+  state.audit.unshift({time:new Date().toLocaleString(),user:currentUser.id,role:currentUser.role,action});
+  state.audit=state.audit.slice(0,500); saveState(); renderAudit();
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function userById(id){return state.users.find(u=>u.id===id);}
+function renderUsers(){
+  $("usersTable").innerHTML=state.users.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.id)}</td><td>${esc(u.role)}</td><td><span class="badge green">Active</span></td></tr>`).join("")||'<tr><td colspan="4">No accounts created.</td></tr>';
+  $("taskAnalyst").innerHTML='<option value="">Select analyst</option>'+state.users.filter(u=>u.role==="QC Analyst").map(u=>`<option value="${esc(u.id)}">${esc(u.name)} (${esc(u.id)})</option>`).join("");
+}
+function badge(status){
+ const cls = /approved|completed|forwarded|submitted|qc reviewed/i.test(status)?"green":/pending|assigned|in progress|review/i.test(status)?"amber":/rejected|returned/i.test(status)?"red":"";
+ return `<span class="badge ${cls}">${esc(status)}</span>`;
+}
+function renderTasks(){
+ const visible=state.tasks.filter(t=>currentUser.role==="Admin"||currentUser.role==="QC Reviewer"||t.analystId===currentUser.id||t.createdBy===currentUser.id||["QA Reviewer","QA Approver"].includes(currentUser.role));
+ $("tasksTable").innerHTML=visible.map(t=>{
+  let action="";
+  if(currentUser.role==="QC Reviewer" && ["Pending QC assignment","Assigned to Analyst"].includes(t.status)) action=`<button class="secondary" data-task-action="assign" data-id="${t.id}">Assign / reassign</button>`;
+  else if(currentUser.role==="QC Reviewer" && t.status==="Submitted for QC review") action=`<button class="secondary" data-task-action="qc-review" data-id="${t.id}">Mark QC reviewed</button>`;
+  else if(currentUser.role==="QC Analyst" && t.analystId===currentUser.id && t.status==="Assigned to Analyst") action=`<button class="secondary" data-task-action="enter-result" data-id="${t.id}">Enter result</button>`;
+  return `<tr><td>${esc(t.title)}</td><td>${esc(t.sampleRef)}</td><td>${esc(t.analystId||"Unassigned")}</td><td>${badge(t.status)}</td><td>${esc(t.result||t.notes||"—")}</td><td>${action||"—"}</td></tr>`;
+ }).join("")||'<tr><td colspan="6">No tasks for this view yet.</td></tr>';
+ $("myTasks").innerHTML=visible.filter(t=>t.analystId===currentUser.id||t.createdBy===currentUser.id||["QC Reviewer","QA Reviewer","QA Approver","Admin"].includes(currentUser.role)).slice(0,8).map(t=>`<tr><td>${esc(t.title)}</td><td>${esc(t.sampleRef)}</td><td>${badge(t.status)}</td><td>${esc(t.analystId||"Unassigned")}</td></tr>`).join("")||'<tr><td colspan="4">No pending tasks.</td></tr>';
+ $("qaReviewTable").innerHTML=state.tasks.filter(t=>t.status==="QC reviewed").map(t=>`<tr><td>${esc(t.title)}</td><td>${esc(t.sampleRef)}</td><td>${esc(t.result||"—")}<br><span class="muted">${esc(t.rawRef||"")}</span></td><td>${esc(t.qcReviewer||"")}</td><td><button class="secondary" data-task-action="forward-qa" data-id="${t.id}">Forward to QA Approver</button></td></tr>`).join("")||'<tr><td colspan="5">No QC-reviewed records waiting for QA review.</td></tr>';
+ $("approvalTable").innerHTML=state.tasks.filter(t=>t.status==="Forwarded to QA Approver"||t.status==="QA approved"||t.status==="Returned by QA").map(t=>`<tr><td>${esc(t.title)}</td><td>${esc(t.sampleRef)}</td><td>${esc(t.result||"—")}</td><td>${esc(t.qaReviewer||"")}</td><td>${t.status==="Forwarded to QA Approver"?`<button class="secondary" data-task-action="approve" data-id="${t.id}">Approve (demo)</button> <button class="secondary" data-task-action="return-qa" data-id="${t.id}">Return</button>`:badge(t.status)}</td></tr>`).join("")||'<tr><td colspan="5">No records forwarded for QA approval.</td></tr>';
+ $("resultTask").innerHTML='<option value="">Select your assigned task</option>'+state.tasks.filter(t=>currentUser.role==="QC Analyst"&&t.analystId===currentUser.id&&t.status==="Assigned to Analyst").map(t=>`<option value="${t.id}">${esc(t.title)} — ${esc(t.sampleRef)}</option>`).join("");
+}
+function renderSamples(){
+ $("samplesTable").innerHTML=state.samples.map(s=>`<tr><td>${esc(s.ref)}</td><td>${esc(s.product)}</td><td>${esc(s.batch)}</td><td>${esc(s.analysis)}</td><td>${badge(s.status)}</td></tr>`).join("")||'<tr><td colspan="5">No samples registered yet.</td></tr>';
+}
+function renderAudit(){
+ $("auditTable").innerHTML=state.audit.map(a=>`<tr><td>${esc(a.time)}</td><td>${esc(a.user)}</td><td>${esc(a.role)}</td><td>${esc(a.action)}</td></tr>`).join("")||'<tr><td colspan="4">No activity recorded.</td></tr>';
+}
+const roleInfo={
+ "QC Analyst":{title:"QC Analyst Dashboard",metrics:[["Assigned tasks","Your queue"],["Result entry","Assigned tasks only"],["Submission","Send to QC Reviewer"]],workflow:"Perform assigned tests, record results and raw-data references, then submit the task for QC review."},
+ "QC Reviewer":{title:"QC Reviewer Dashboard",metrics:[["Incoming requests","Review and assign"],["Submitted results","QC review"],["Task allocation","Assign analyst"]],workflow:"Review incoming sample requests, assign tasks to analysts, and mark submitted results QC reviewed before QA review."},
+ "QA Reviewer":{title:"QA Reviewer Dashboard",metrics:[["QC-reviewed records","Review"],["Quality records","Check documentation"],["Forwarding","Send to QA Approver"]],workflow:"Review QC-reviewed data and supporting references, then forward the record to QA Approver or return it for correction."},
+ "QA Approver":{title:"QA Approver Dashboard",metrics:[["Forwarded records","Pending decision"],["Decision","Approve or return"],["Authority","Assigned scope only"]],workflow:"Review records forwarded by QA Reviewer and approve or return them according to your authorization. This prototype action is not an electronic signature."},
+ "Admin":{title:"Administrator Dashboard",metrics:[["User accounts","Manage"],["Role assignment","Configure"],["Workflow oversight","View queues"]],workflow:"Create user accounts and assign roles. Admin access does not automatically authorize QC review or QA approval."}
+};
+function renderDashboard(){
+ const info=roleInfo[currentUser.role];$("dashTitle").textContent=info.title;$("dashWorkflow").textContent=info.workflow;
+ $("metrics").innerHTML=info.metrics.map(([a,b])=>`<div class="card"><div class="metric-label">${esc(a)}</div><div class="metric-value" style="font-size:19px">${esc(b)}</div></div>`).join("");
+}
+function showPage(id){
+ const nav=document.querySelector(`.nav[data-page="${id}"]`);
+ if(!nav||nav.hidden){alert("Your role does not have access to this section.");return;}
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));
+ renderAll();
+}
+function renderAll(){if(!currentUser)return;renderDashboard();renderUsers();renderTasks();renderSamples();renderAudit();}
+function signIn(user){currentUser=user;$("authScreen").hidden=true;$("app").hidden=false;$("userName").textContent=user.name+" ("+user.id+")";$("userRole").textContent=user.role;
+ document.querySelectorAll(".nav").forEach(n=>{const roles=n.dataset.roles;n.hidden=!!roles&&!roles.split(",").includes(user.role);});
+ logActivity("Signed in");renderAll();showPage("dashboard");
+}
+function signOut(){if(currentUser)logActivity("Signed out");currentUser=null;$("app").hidden=true;$("authScreen").hidden=false;$("loginForm").reset();$("loginError").textContent="";updateAuthView();}
+$("setupForm").addEventListener("submit",e=>{
+ e.preventDefault();if(state.users.length){updateAuthView();return;}
+ const name=$("setupName").value.trim(),id=$("setupUser").value.trim(),pass=$("setupPass").value;
+ if(pass!==$("setupConfirm").value){$("setupError").textContent="Passwords do not match.";return;}
+ if(pass.length<12){$("setupError").textContent="Use at least 12 characters.";return;}
+ if(!name||!id){$("setupError").textContent="Enter a name and user ID.";return;}
+ state.users.push({name,id,role:"Admin",password:pass});saveState();$("setupError").textContent="";currentUser=state.users[0];signIn(currentUser);
+});
+$("loginForm").addEventListener("submit",e=>{
+ e.preventDefault();const id=$("loginUser").value.trim(),pass=$("loginPass").value;const u=userById(id);
+ if(!u||u.password!==pass){$("loginError").textContent="Invalid User ID or password.";return;}
+ $("loginError").textContent="";signIn(u);
+});
+$("logout").addEventListener("click",signOut);
+document.querySelectorAll(".nav").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.page)));
+
+$("createUserForm").addEventListener("submit",e=>{
+ e.preventDefault();if(!currentUser||currentUser.role!=="Admin")return;
+ const name=$("newName").value.trim(),id=$("newUser").value.trim(),password=$("newPass").value,role=$("newRole").value;
+ if(state.users.some(u=>u.id.toLowerCase()===id.toLowerCase())){$("userMessage").textContent="That User ID already exists.";return;}
+ if(password.length<12){$("userMessage").textContent="Password must be at least 12 characters.";return;}
+ state.users.push({name,id,password,role});saveState();logActivity("Created account "+id+" with role "+role);$("userMessage").textContent="Account created for "+id+" ("+role+"). Share credentials securely and require a password-change process in production.";e.target.reset();renderAll();
+});
+
+$("sampleForm").addEventListener("submit",e=>{
+ e.preventDefault();if(currentUser.role!=="QC Analyst"){alert("Only QC Analyst can register samples in this prototype.");return;}
+ const ref="LS-"+new Date().getFullYear()+"-"+state.nextSample++;
+ const s={ref,product:$("sampleProduct").value.trim(),batch:$("sampleBatch").value.trim(),analysis:$("sampleAnalysis").value,type:$("sampleType").value,status:"Pending QC assignment",createdBy:currentUser.id};
+ state.samples.unshift(s);const task={id:state.nextTask++,title:"Review and assign: "+s.analysis,sampleRef:ref,analystId:"",createdBy:currentUser.id,status:"Pending QC assignment",notes:"Sample type: "+s.type};state.tasks.unshift(task);saveState();logActivity("Registered sample "+ref+" and requested QC assignment");$("sampleMessage").textContent="Registered "+ref+". It is now waiting in the QC Reviewer queue.";e.target.reset();renderAll();
+});
+$("taskForm").addEventListener("submit",e=>{
+ e.preventDefault();if(currentUser.role!=="QC Reviewer")return;
+ const analyst=userById($("taskAnalyst").value);if(!analyst||analyst.role!=="QC Analyst"){$("taskMessage").textContent="Choose a valid QC Analyst account.";return;}
+ const task={id:state.nextTask++,title:$("taskName").value.trim(),sampleRef:$("taskSample").value.trim(),analystId:analyst.id,createdBy:currentUser.id,status:"Assigned to Analyst",due:$("taskDue").value,notes:$("taskNotes").value.trim()};
+ state.tasks.unshift(task);saveState();logActivity("Assigned task "+task.title+" to "+analyst.id);$("taskMessage").textContent="Task assigned to "+analyst.name+".";e.target.reset();renderAll();
+});
+$("resultForm").addEventListener("submit",e=>{
+ e.preventDefault();if(currentUser.role!=="QC Analyst")return;const task=state.tasks.find(t=>t.id===Number($("resultTask").value));
+ if(!task||task.analystId!==currentUser.id||task.status!=="Assigned to Analyst"){$("resultMessage").textContent="That task is not assigned to you or is no longer open.";return;}
+ task.result=$("resultValue").value.trim();task.rawRef=$("resultRaw").value.trim();task.analystNotes=$("resultNotes").value.trim();task.submittedBy=currentUser.id;task.status="Submitted for QC review";saveState();logActivity("Submitted results for "+task.sampleRef+" to QC Reviewer");$("resultMessage").textContent="Results submitted to the QC Reviewer queue.";e.target.reset();renderAll();
+});
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-task-action]");if(!b||!currentUser)return;const task=state.tasks.find(t=>t.id===Number(b.dataset.id));if(!task)return;
+ const action=b.dataset.taskAction;
+ if(action==="assign"&&currentUser.role==="QC Reviewer"){
+   const analysts=state.users.filter(u=>u.role==="QC Analyst");if(!analysts.length){alert("Admin must create a QC Analyst account first.");return;}
+   const chosen=prompt("Enter the exact User ID of the QC Analyst to assign:\n"+analysts.map(u=>u.id+" — "+u.name).join("\n"),task.analystId||"");
+   if(chosen===null)return;const analyst=userById(chosen.trim());if(!analyst||analyst.role!=="QC Analyst"){alert("That ID is not a QC Analyst account.");return;}
+   task.analystId=analyst.id;task.status="Assigned to Analyst";task.assignedBy=currentUser.id;saveState();logActivity("Assigned/reassigned task "+task.id+" to "+analyst.id);
+ } else if(action==="enter-result"&&currentUser.role==="QC Analyst"){showPage("testingPage");return;
+ } else if(action==="qc-review"&&currentUser.role==="QC Reviewer"&&task.status==="Submitted for QC review"){
+   const decision=prompt("Enter QC review decision: type REVIEWED or RETURN","REVIEWED");if(decision===null)return;
+   if(decision.trim().toUpperCase()==="REVIEWED"){task.status="QC reviewed";task.qcReviewer=currentUser.id;logActivity("QC reviewed task "+task.id);}
+   else if(decision.trim().toUpperCase()==="RETURN"){task.status="Returned to Analyst";task.qcReviewer=currentUser.id;logActivity("Returned task "+task.id+" to analyst");}
+   else {alert("Enter REVIEWED or RETURN.");return;}
+   saveState();
+ } else if(action==="forward-qa"&&currentUser.role==="QA Reviewer"&&task.status==="QC reviewed"){
+   task.status="Forwarded to QA Approver";task.qaReviewer=currentUser.id;saveState();logActivity("Forwarded task "+task.id+" to QA Approver");
+ } else if((action==="approve"||action==="return-qa")&&currentUser.role==="QA Approver"&&task.status==="Forwarded to QA Approver"){
+   const ok=confirm(action==="approve"?"Mark this record QA approved in the DEMO workflow? This is not an electronic signature.":"Return this record to QA Reviewer?");
+   if(!ok)return;task.status=action==="approve"?"QA approved":"Returned by QA";task.qaApprover=currentUser.id;saveState();logActivity((action==="approve"?"Demo QA-approved":"Returned") +" task "+task.id);
+ }
+ renderAll();
+});
+$("oosForm").addEventListener("submit",e=>{
+ e.preventDefault();if(!currentUser)return;logActivity("Recorded demo OOS/OOT note for "+$("oosRef").value.trim());$("oosMessage").textContent="Note logged for this browser session. Follow approved SOP for real investigations.";e.target.reset();
+});
+loadState();
+</script></body></html>
